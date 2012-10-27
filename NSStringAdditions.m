@@ -31,6 +31,7 @@
       usingUCSDAndHintEncoding:(NSStringEncoding)hintEnc
 			 error:(NSError **)error;
 {
+	/* if UCSD can't detection character set use hintEnc */
 	NSStringEncoding enc = [UCSD encodingWithContentsOfFile:path];
 	if (enc == kCFStringEncodingInvalidId)
 		enc = hintEnc;
