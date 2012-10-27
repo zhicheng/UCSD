@@ -1,0 +1,12 @@
+# temple file
+#############
+.DS_Store
+tmp/
+# compiler file
+###############
+build
+
+# Xcode junk file
+#################
+*.xcodeproj/
+!.xcodeproj/project.pbxproj
