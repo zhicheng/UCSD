@@ -27,7 +27,7 @@
 #include "charsetdetect.h"
 
 const char *
-EnodingDetection(const char *file)
+EncodingDetection(const char *file)
 {
 	const char *unknownEncoding = "Unknown";
 	csd_t csd = csd_open();
@@ -52,13 +52,29 @@ EnodingDetection(const char *file)
 		return result;
 }
 
+const char *
+EncodingDetectionFromString(const char *data, size_t size)
+{
+	const char *unknownEncoding = "Unknown";
+	csd_t csd = csd_open();
+	if (csd == (csd_t)-1)
+		return unknownEncoding;
+	
+	if (csd_consider(csd, data, size) < 0)
+		return unknownEncoding;
+	
+	const char *result = csd_close(csd);
+	if (result == NULL)
+		return unknownEncoding;
+	else
+		return result;
+}
+
 @implementation UCSD
 
-+ (NSStringEncoding)encodingWithContentsOfFile:(NSString *)path
+
++ (NSStringEncoding)encodingWithEncodingString:(NSString *)encodingString
 {
-	const char *file = [path UTF8String];
-	NSString *encodingString = [NSString stringWithCString:EnodingDetection(file)
-						      encoding:NSUTF8StringEncoding];
 	CFStringEncoding encoding = kCFStringEncodingInvalidId;
 	if ([encodingString isEqualToString:@"Big5"])
 		encoding = kCFStringEncodingBig5;
@@ -126,6 +142,25 @@ EnodingDetection(const char *file)
 		encoding = kCFStringEncodingMacCyrillic;
 
 	return CFStringConvertEncodingToNSStringEncoding(encoding);
+}
+
++ (NSStringEncoding)encodingWithContentsOfFile:(NSString *)path;
+{
+	const char *file = [path UTF8String];
+	NSString *encodingString = [NSString stringWithCString:EncodingDetection(file)
+						      encoding:NSUTF8StringEncoding];
+	return [self encodingWithEncodingString:encodingString];
+}
+
++ (NSStringEncoding)encodingWithContentsOfData:(NSData *)data;
+{
+	const char *buf  = [data bytes];
+	size_t      size = [data length];
+
+	const char *encoding = EncodingDetectionFromString(buf, size);
+	NSString *encodingString = [NSString stringWithCString:encoding
+						      encoding:NSUTF8StringEncoding];
+	return [self encodingWithEncodingString:encodingString];
 }
 
 @end

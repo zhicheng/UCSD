@@ -24,6 +24,7 @@
 @interface UCSD : NSObject
 
 + (NSStringEncoding)encodingWithContentsOfFile:(NSString *)path;
++ (NSStringEncoding)encodingWithContentsOfData:(NSData *)data;
 
 @end
 
